@@ -12,20 +12,19 @@ public class WasmConfiguration implements Cloneable {
 
     @Metadata(required = true)
     @UriParam
-    private String function;
+    private String resource;
 
     /**
-     * The function
+     * The resource
      */
-    public String getFunction() {
-        return function;
+    public String getResource() {
+        return resource;
     }
 
-    public void setFunction(String function) {
-        this.function = function;
+    public void setResource(String resource) {
+        this.resource = resource;
     }
-
-    // ************************
+// ************************
     //
     // Clone
     //

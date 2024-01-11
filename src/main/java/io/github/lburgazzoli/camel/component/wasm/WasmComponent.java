@@ -31,7 +31,7 @@ public class WasmComponent extends DefaultComponent {
             Map<String, Object> parameters) throws Exception {
 
         if (ObjectHelper.isEmpty(remaining)) {
-            throw new IllegalArgumentException("Expecting URI in the form of: 'wasm:resource/', got '" + uri + "'");
+            throw new IllegalArgumentException("Expecting URI in the form of: 'wasm:functionName', got '" + uri + "'");
         }
 
         WasmConfiguration configuration = this.configuration.copy();
