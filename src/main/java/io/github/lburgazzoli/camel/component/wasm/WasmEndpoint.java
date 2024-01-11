@@ -33,7 +33,7 @@ public class WasmEndpoint extends DefaultEndpoint {
 
     @Metadata(required = true)
     @UriPath(description = "The Function")
-    private final String function;
+    private final String functionName;
 
     @UriParam
     private WasmConfiguration configuration;
@@ -43,19 +43,27 @@ public class WasmEndpoint extends DefaultEndpoint {
             String endpointUri,
             Component component,
             String resource,
-            String function,
+            String functionName,
             WasmConfiguration configuration) {
 
         super(endpointUri, component);
 
         this.resource = resource;
-        this.function = function;
+        this.functionName = functionName;
         this.configuration = configuration;
+    }
+
+    public String getResource() {
+        return resource;
+    }
+
+    public String getFunctionName() {
+        return functionName;
     }
 
     @Override
     public Producer createProducer() throws Exception {
-        return new WasmProducer(this);
+        return new WasmProducer(this, resource, functionName);
     }
 
     @Override
