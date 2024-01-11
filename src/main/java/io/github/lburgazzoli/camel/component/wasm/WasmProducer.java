@@ -1,31 +1,25 @@
 package io.github.lburgazzoli.camel.component.wasm;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.dylibso.chicory.runtime.ExportFunction;
-import com.dylibso.chicory.runtime.Instance;
-import com.dylibso.chicory.runtime.Memory;
 import com.dylibso.chicory.runtime.Module;
-import com.dylibso.chicory.wasm.types.Value;
-import org.apache.camel.AsyncCallback;
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.spi.Resource;
 import org.apache.camel.spi.ResourceLoader;
-import org.apache.camel.support.DefaultAsyncProducer;
+import org.apache.camel.support.DefaultProducer;
 import org.apache.camel.support.PluginHelper;
 
-public class WasmProducer extends DefaultAsyncProducer {
+public class WasmProducer extends DefaultProducer {
 
     private final String resource;
     private final String functionName;
 
     private Module module;
-    private Instance instance;
-    private ExportFunction function;
-
-    private ExportFunction alloc;
-    private ExportFunction dealloc;
+    private WasmFunction function;
 
     public WasmProducer(Endpoint endpoint, String resource, String functionName) throws Exception {
         super(endpoint);
@@ -49,12 +43,8 @@ public class WasmProducer extends DefaultAsyncProducer {
     public void doStart() throws Exception {
         super.doStart();
 
-        if (this.module != null && this.instance == null) {
-            this.instance = this.module.instantiate();
-
-            this.function = instance.getExport(this.functionName);
-            this.alloc = instance.getExport(Wasm.FN_ALLOC);
-            this.dealloc = instance.getExport(Wasm.FN_DEALLOC);
+        if (this.module != null && this.function == null) {
+            this.function = new WasmFunction(this.module, this.functionName);
         }
     }
 
@@ -62,51 +52,60 @@ public class WasmProducer extends DefaultAsyncProducer {
     public void doStop() throws Exception {
         super.doStop();
 
-        this.instance = null;
+        this.function = null;
     }
 
     @Override
     public void doShutdown() throws Exception {
         super.doShutdown();
 
-        this.instance = null;
+        this.function = null;
         this.module = null;
     }
 
     @Override
-    public boolean process(Exchange exchange, AsyncCallback callback) {
-        Memory memory = instance.getMemory();
-        int inPtr = -1;
-        int inSize = 0;
-        int outPtr = -1;
-        int outSize = 0;
+    public void process(Exchange exchange) throws Exception {
+        byte[] in = serialize(exchange);
+        byte[] result = function.run(in);
 
-        try {
-            // TODO: serialize exchange
-            // TODO: compute inSize
-            inPtr = alloc.apply(Value.i32(inSize))[0].asInt();
-            memory.write(inPtr, (byte[])null);
+        deserialize(result, exchange);
+    }
 
-            long ptrAndSize = function.apply(Value.i32(inPtr), Value.i32(inSize))[0].asLong();
+    //
+    // Terrible code here below with a lot of assumptions ...
+    // But good enough for the POC
+    //
 
-            outPtr = (int)(ptrAndSize >> 32);
-            outSize = (int)ptrAndSize;
+    public byte[] serialize(Exchange exchange) throws Exception {
+        Envelope env = new Envelope();
+        env.body = exchange.getMessage().getBody(byte[].class);
 
-            byte[] answer = memory.readBytes(outPtr, outSize);
-
-            // TODO: de-serialize exchange
-
-        } finally {
-            if (inPtr != -1) {
-                // TODO: check for error
-                dealloc.apply(Value.i32(inPtr), Value.i32(inSize));
-            }
-            if (outPtr != -1) {
-                // TODO: check for error
-                dealloc.apply(Value.i32(outPtr), Value.i32(outSize));
-            }
+        for (String headerName: exchange.getMessage().getHeaders().keySet()) {
+            env.headers.put(headerName, exchange.getMessage().getHeader(headerName, String.class));
         }
 
-        throw new UnsupportedOperationException("TODO");
+        return Wasm.MAPPER.writeValueAsBytes(env);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public void deserialize(byte[] in, Exchange out) throws Exception {
+        // cleanup
+        out.getMessage().getHeaders().clear();
+        out.getMessage().setBody(null);
+
+        Envelope env = Wasm.MAPPER.readValue(in, Envelope.class);
+        out.getMessage().setBody(env.body);
+
+        if (env.headers != null) {
+            out.getMessage().setHeaders((Map) env.headers);
+        }
+    }
+
+    public static class Envelope {
+        @JsonValue
+        public Map<String, String> headers = new HashMap<>();
+
+        @JsonValue
+        public byte[] body;
     }
 }

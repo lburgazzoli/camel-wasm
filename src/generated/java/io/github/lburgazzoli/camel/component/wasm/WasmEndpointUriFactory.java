@@ -22,7 +22,7 @@ public class WasmEndpointUriFactory extends org.apache.camel.support.component.E
     private static final Set<String> MULTI_VALUE_PREFIXES;
     static {
         Set<String> props = new HashSet<>(3);
-        props.add("function");
+        props.add("functionName");
         props.add("lazyStartProducer");
         props.add("resource");
         PROPERTY_NAMES = Collections.unmodifiableSet(props);
@@ -43,7 +43,7 @@ public class WasmEndpointUriFactory extends org.apache.camel.support.component.E
         Map<String, Object> copy = new HashMap<>(properties);
 
         uri = buildPathParameter(syntax, uri, "resource", null, true, copy);
-        uri = buildPathParameter(syntax, uri, "function", null, true, copy);
+        uri = buildPathParameter(syntax, uri, "functionName", null, true, copy);
         uri = buildQueryParameters(uri, copy, encode);
         return uri;
     }

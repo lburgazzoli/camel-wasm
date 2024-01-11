@@ -35,11 +35,21 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <camel.version>4.3.0</camel.version>
-    <chicory.version>0.0.2</chicory.version>
+    <chicory.version>0.0.3-SNAPSHOT</chicory.version>
+    <junit.version>5.10.1</junit.version>
+    <slf4j.version>2.0.7</slf4j.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${junit.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
       <dependency>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-bom</artifactId>
@@ -67,9 +77,54 @@
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-support</artifactId>
     </dependency>
+
     <dependency>
       <groupId>com.dylibso.chicory</groupId>
       <artifactId>runtime</artifactId>
+    </dependency>
+
+    <!--
+      for serialization, we may want to include individual jackson libs, but not in scope for the poc
+    -->
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-jackson</artifactId>
+    </dependency>
+
+    <!-- test -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${slf4j.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-direct</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-log</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-mock</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-core-languages</artifactId>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>
@@ -223,6 +278,15 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
