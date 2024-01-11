@@ -21,6 +21,7 @@ public class WasmEndpointConfigurer extends PropertyConfigurerSupport implements
     public boolean configure(CamelContext camelContext, Object obj, String name, Object value, boolean ignoreCase) {
         WasmEndpoint target = (WasmEndpoint) obj;
         switch (ignoreCase ? name.toLowerCase() : name) {
+        case "function": target.getConfiguration().setFunction(property(camelContext, java.lang.String.class, value)); return true;
         case "lazystartproducer":
         case "lazyStartProducer": target.setLazyStartProducer(property(camelContext, boolean.class, value)); return true;
         default: return false;
@@ -30,6 +31,7 @@ public class WasmEndpointConfigurer extends PropertyConfigurerSupport implements
     @Override
     public Class<?> getOptionType(String name, boolean ignoreCase) {
         switch (ignoreCase ? name.toLowerCase() : name) {
+        case "function": return java.lang.String.class;
         case "lazystartproducer":
         case "lazyStartProducer": return boolean.class;
         default: return null;
@@ -40,6 +42,7 @@ public class WasmEndpointConfigurer extends PropertyConfigurerSupport implements
     public Object getOptionValue(Object obj, String name, boolean ignoreCase) {
         WasmEndpoint target = (WasmEndpoint) obj;
         switch (ignoreCase ? name.toLowerCase() : name) {
+        case "function": return target.getConfiguration().getFunction();
         case "lazystartproducer":
         case "lazyStartProducer": return target.isLazyStartProducer();
         default: return null;

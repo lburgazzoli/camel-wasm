@@ -19,17 +19,31 @@ public class WasmConfigurationConfigurer extends org.apache.camel.support.compon
 
     @Override
     public boolean configure(CamelContext camelContext, Object obj, String name, Object value, boolean ignoreCase) {
-        return false;
+        io.github.lburgazzoli.camel.component.wasm.WasmConfiguration target = (io.github.lburgazzoli.camel.component.wasm.WasmConfiguration) obj;
+        switch (ignoreCase ? name.toLowerCase() : name) {
+        case "function":
+        case "Function": target.setFunction(property(camelContext, java.lang.String.class, value)); return true;
+        default: return false;
+        }
     }
 
     @Override
     public Class<?> getOptionType(String name, boolean ignoreCase) {
-        return null;
+        switch (ignoreCase ? name.toLowerCase() : name) {
+        case "function":
+        case "Function": return java.lang.String.class;
+        default: return null;
+        }
     }
 
     @Override
     public Object getOptionValue(Object obj, String name, boolean ignoreCase) {
-        return null;
+        io.github.lburgazzoli.camel.component.wasm.WasmConfiguration target = (io.github.lburgazzoli.camel.component.wasm.WasmConfiguration) obj;
+        switch (ignoreCase ? name.toLowerCase() : name) {
+        case "function":
+        case "Function": return target.getFunction();
+        default: return null;
+        }
     }
 }
 

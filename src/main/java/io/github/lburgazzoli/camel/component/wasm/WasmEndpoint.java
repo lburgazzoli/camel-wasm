@@ -18,7 +18,7 @@ import org.apache.camel.support.DefaultEndpoint;
     firstVersion = "4.4.0",
     scheme = Wasm.SCHEME,
     title = "Wasm",
-    syntax = "wasm:resource/function",
+    syntax = "wasm:resource",
     producerOnly = true,
     category = {
         Category.CORE,
@@ -31,10 +31,6 @@ public class WasmEndpoint extends DefaultEndpoint {
     @UriPath(description = "The Resource")
     private final String resource;
 
-    @Metadata(required = true)
-    @UriPath(description = "The Function")
-    private final String functionName;
-
     @UriParam
     private WasmConfiguration configuration;
 
@@ -43,27 +39,21 @@ public class WasmEndpoint extends DefaultEndpoint {
             String endpointUri,
             Component component,
             String resource,
-            String functionName,
             WasmConfiguration configuration) {
 
         super(endpointUri, component);
 
         this.resource = resource;
-        this.functionName = functionName;
         this.configuration = configuration;
     }
 
-    public String getResource() {
-        return resource;
-    }
-
-    public String getFunctionName() {
-        return functionName;
+    public WasmConfiguration getConfiguration() {
+        return configuration;
     }
 
     @Override
     public Producer createProducer() throws Exception {
-        return new WasmProducer(this, resource, functionName);
+        return new WasmProducer(this, resource, configuration.getFunction());
     }
 
     @Override

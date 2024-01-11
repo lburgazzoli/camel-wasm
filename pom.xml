@@ -38,6 +38,7 @@
     <chicory.version>0.0.3-SNAPSHOT</chicory.version>
     <junit.version>5.10.1</junit.version>
     <slf4j.version>2.0.7</slf4j.version>
+    <assertj.version>3.24.2</assertj.version>
   </properties>
 
   <dependencyManagement>
@@ -125,6 +126,11 @@
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-core-languages</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>${assertj.version}</version>
     </dependency>
 
   </dependencies>
@@ -252,6 +258,11 @@
           <artifactId>quarkus-extension-maven-plugin</artifactId>
           <version>${quarkus.version}</version>
         </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>${exec-maven-plugin.version}</version>
+        </plugin>
       </plugins>
     </pluginManagement>
 
@@ -288,6 +299,30 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
       </plugin>
+
+      <!--
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compile-wasm</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <executable>${project.basedir}/src/go/build.sh</executable>
+          <arguments>
+            <argument>${project.basedir}</argument>
+            <argument>src/go/to_upper.go</argument>
+            <argument>src/go/to_upper.wasm</argument>
+          </arguments>
+        </configuration>
+      </plugin>
+      -->
     </plugins>
   </build>
 </project>
