@@ -19,7 +19,7 @@ public class WasmComponentTest {
                 @Override
                 public void configure() throws Exception {
                     from("direct:in")
-                        .to("wasm:process?resource=file:src/rust/to_upper.wasm");
+                        .to("wasm:process?resource=to_upper.wasm");
                 }
             });
             cc.start();

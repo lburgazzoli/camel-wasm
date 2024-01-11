@@ -12,4 +12,4 @@ rustc ${SCRIPT_DIR}/to_upper.rs \
   --crate-type=cdylib \
   -C opt-level=0 \
   -C debuginfo=0 \
-  -o ${SCRIPT_DIR}/to_upper.wasm
+  -o ${SCRIPT_DIR}/../../test/resources/to_upper.wasm
