@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.dylibso.chicory.runtime.Module;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.spi.Resource;
@@ -102,10 +102,10 @@ public class WasmProducer extends DefaultProducer {
     }
 
     public static class Envelope {
-        @JsonValue
+        @JsonProperty
         public Map<String, String> headers = new HashMap<>();
 
-        @JsonValue
+        @JsonProperty
         public byte[] body;
     }
 }
