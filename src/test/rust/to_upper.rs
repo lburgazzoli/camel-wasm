@@ -3,6 +3,7 @@ extern crate core;
 extern crate wee_alloc;
 
 use std::mem;
+use std::mem::MaybeUninit;
 use std::slice;
 use std::collections::HashMap;
 
@@ -25,19 +26,18 @@ struct Message {
 
 #[cfg_attr(all(target_arch = "wasm32"), export_name = "alloc")]
 #[no_mangle]
-pub extern "C" fn alloc(len: u32) -> *mut u8 {
-    let mut buf = Vec::with_capacity(len as usize);
-    let ptr = buf.as_mut_ptr();
+pub extern "C" fn alloc(size: u32) -> *mut u8 {
+   // Allocate the amount of bytes needed.
+   let vec: Vec<MaybeUninit<u8>> = Vec::with_capacity(size as usize);
 
-    // tell Rust not to clean this up
-    mem::forget(buf);
-
-    return ptr
+   // into_raw leaks the memory to the caller.
+   Box::into_raw(vec.into_boxed_slice()) as *mut u8
 }
 
 #[cfg_attr(all(target_arch = "wasm32"), export_name = "dealloc")]
 #[no_mangle]
 pub unsafe extern "C" fn dealloc(ptr: &mut u8, len: i32) {
+    // Retakes the pointer which allows its memory to be freed.
     let _ = Vec::from_raw_parts(ptr, 0, len as usize);
 }
 
