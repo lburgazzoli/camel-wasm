@@ -2,7 +2,6 @@ extern crate alloc;
 extern crate core;
 extern crate wee_alloc;
 
-use std::mem;
 use std::mem::MaybeUninit;
 use std::slice;
 use std::collections::HashMap;
