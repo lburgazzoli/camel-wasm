@@ -37,7 +37,6 @@ public class WasmFunction implements AutoCloseable {
         try {
             inPtr = alloc.apply(Value.i32(inSize))[0].asInt();
             instance.getMemory().write(inPtr, in);
-            Wasm.MAPPER.createObjectNode();
 
             Value[] results = function.apply(Value.i32(inPtr), Value.i32(inSize));
             long ptrAndSize = results[0].asUInt();

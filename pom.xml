@@ -317,7 +317,7 @@
           <executable>${project.basedir}/src/go/build.sh</executable>
           <arguments>
             <argument>${project.basedir}</argument>
-            <argument>src/go/lib.rs</argument>
+            <argument>src/go/to_upper.rs</argument>
             <argument>src/go/to_upper.wasm</argument>
           </arguments>
         </configuration>
