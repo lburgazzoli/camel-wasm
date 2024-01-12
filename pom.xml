@@ -300,7 +300,6 @@
         <artifactId>maven-failsafe-plugin</artifactId>
       </plugin>
 
-      <!--
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -314,15 +313,11 @@
           </execution>
         </executions>
         <configuration>
-          <executable>${project.basedir}/src/go/build.sh</executable>
-          <arguments>
-            <argument>${project.basedir}</argument>
-            <argument>src/go/to_upper.rs</argument>
-            <argument>src/go/to_upper.wasm</argument>
-          </arguments>
+          <executable>${project.basedir}/src/test/rust/build.sh</executable>
+          <workingDirectory>${project.basedir}/src/test/rust</workingDirectory>
         </configuration>
       </plugin>
-      -->
+
     </plugins>
   </build>
 </project>

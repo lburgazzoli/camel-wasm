@@ -5,5 +5,5 @@ set -euxo pipefail
 
 cargo build --target wasm32-unknown-unknown --release
 
-cp target/wasm32-unknown-unknown/release/to_upper.wasm ../resources
+cp target/wasm32-unknown-unknown/release/functions.wasm ../resources
 

@@ -1,11 +1,8 @@
 package io.github.lburgazzoli.camel.component.wasm;
 
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.dylibso.chicory.runtime.Module;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.spi.Resource;
@@ -65,47 +62,9 @@ public class WasmProducer extends DefaultProducer {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        byte[] in = serialize(exchange);
+        byte[] in = WasmSupport.serialize(exchange);
         byte[] result = function.run(in);
 
-        deserialize(result, exchange);
-    }
-
-    //
-    // Terrible code here below with a lot of assumptions ...
-    // But good enough for the POC
-    //
-
-    public byte[] serialize(Exchange exchange) throws Exception {
-        Envelope env = new Envelope();
-        env.body = exchange.getMessage().getBody(byte[].class);
-
-        for (String headerName: exchange.getMessage().getHeaders().keySet()) {
-            env.headers.put(headerName, exchange.getMessage().getHeader(headerName, String.class));
-        }
-
-        return Wasm.MAPPER.writeValueAsBytes(env);
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public void deserialize(byte[] in, Exchange out) throws Exception {
-        // cleanup
-        out.getMessage().getHeaders().clear();
-        out.getMessage().setBody(null);
-
-        Envelope env = Wasm.MAPPER.readValue(in, Envelope.class);
-        out.getMessage().setBody(env.body);
-
-        if (env.headers != null) {
-            out.getMessage().setHeaders((Map) env.headers);
-        }
-    }
-
-    public static class Envelope {
-        @JsonProperty
-        public Map<String, String> headers = new HashMap<>();
-
-        @JsonProperty
-        public byte[] body;
+        WasmSupport.deserialize(result, exchange);
     }
 }

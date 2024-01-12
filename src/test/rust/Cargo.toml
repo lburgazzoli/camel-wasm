@@ -1,12 +1,12 @@
 [package]
-name    = "to_upper"
+name    = "functions"
 version = "0.1.0"
 authors = ["lburgazzoli@gmail.com"]
 edition = "2018"
 
 [lib]
 crate-type = ["cdylib"]
-path = "to_upper.rs"
+path = "functions.rs"
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }

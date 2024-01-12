@@ -67,3 +67,29 @@ pub extern fn process(ptr: u32, len: u32) -> u64 {
 
     return ((out_ptr as u64) << 32) | out_len as u64;
 }
+
+
+#[cfg_attr(all(target_arch = "wasm32"), export_name = "transform")]
+#[no_mangle]
+pub extern fn transform(ptr: u32, len: u32) -> u64 {
+    let bytes = unsafe {
+        slice::from_raw_parts_mut(
+            ptr as *mut u8,
+            len as usize)
+    };
+
+    let msg: Message = serde_json::from_slice(bytes).unwrap();
+    let res = String::from_utf8(msg.body).unwrap().to_uppercase().as_bytes().to_vec();
+
+    let out_len = res.len();
+    let out_ptr = alloc(out_len as u32);
+
+    unsafe {
+        std::ptr::copy_nonoverlapping(
+            res.as_ptr(),
+            out_ptr,
+            out_len as usize)
+    };
+
+    return ((out_ptr as u64) << 32) | out_len as u64;
+}

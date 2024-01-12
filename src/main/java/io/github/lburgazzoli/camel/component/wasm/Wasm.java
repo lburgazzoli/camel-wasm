@@ -3,9 +3,7 @@ package io.github.lburgazzoli.camel.component.wasm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
-final class Wasm {
-    public static final ObjectMapper MAPPER = JsonMapper.builder().build();
-
+public final class Wasm {
     public static final String SCHEME = "wasm";
     public static final String FN_ALLOC = "alloc";
     public static final String FN_DEALLOC = "dealloc";
@@ -16,4 +14,6 @@ final class Wasm {
     public static class Headers {
 
     }
+
+
 }
