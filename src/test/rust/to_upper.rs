@@ -12,8 +12,8 @@ use base64_serde::base64_serde_type;
 base64_serde_type!(Base64Standard, base64::engine::general_purpose::STANDARD);
 
 /// Set the global allocator to the WebAssembly optimized one.
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+//#[global_allocator]
+//static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[derive(Serialize, Deserialize)]
 struct Message {
@@ -23,6 +23,7 @@ struct Message {
     body: Vec<u8>,
 }
 
+#[cfg_attr(all(target_arch = "wasm32"), export_name = "alloc")]
 #[no_mangle]
 pub extern "C" fn alloc(len: u32) -> *mut u8 {
     let mut buf = Vec::with_capacity(len as usize);
@@ -34,6 +35,7 @@ pub extern "C" fn alloc(len: u32) -> *mut u8 {
     return ptr
 }
 
+#[cfg_attr(all(target_arch = "wasm32"), export_name = "dealloc")]
 #[no_mangle]
 pub unsafe extern "C" fn dealloc(ptr: &mut u8, len: i32) {
     let _ = Vec::from_raw_parts(ptr, 0, len as usize);
