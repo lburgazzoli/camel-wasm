@@ -73,6 +73,14 @@ func main() {
 	resultPtr := uint32(ptrSize[0] >> 32)
 	resultSize := uint32(ptrSize[0])
 
+    //fmt.Println(ptrSize[0])
+
+    fmt.Println(dataPtr)
+    fmt.Println(dataSize)
+
+    fmt.Println(resultPtr)
+    fmt.Println(resultSize)
+
 	// This pointer was allocated by Rust, but owned by Go, So, we have to
 	// deallocate it when finished
 	defer func() {

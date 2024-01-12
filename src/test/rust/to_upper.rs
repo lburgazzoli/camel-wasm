@@ -2,7 +2,7 @@ extern crate alloc;
 extern crate core;
 extern crate wee_alloc;
 
-use std::mem::MaybeUninit;
+use std::mem;
 use std::slice;
 use std::collections::HashMap;
 
@@ -26,11 +26,13 @@ struct Message {
 #[cfg_attr(all(target_arch = "wasm32"), export_name = "alloc")]
 #[no_mangle]
 pub extern "C" fn alloc(size: u32) -> *mut u8 {
-   // Allocate the amount of bytes needed.
-   let vec: Vec<MaybeUninit<u8>> = Vec::with_capacity(size as usize);
+    let mut buf = Vec::with_capacity(size as usize);
+    let ptr = buf.as_mut_ptr();
 
-   // into_raw leaks the memory to the caller.
-   Box::into_raw(vec.into_boxed_slice()) as *mut u8
+    // tell Rust not to clean this up
+    mem::forget(buf);
+
+    ptr
 }
 
 #[cfg_attr(all(target_arch = "wasm32"), export_name = "dealloc")]
@@ -43,18 +45,25 @@ pub unsafe extern "C" fn dealloc(ptr: &mut u8, len: i32) {
 #[cfg_attr(all(target_arch = "wasm32"), export_name = "process")]
 #[no_mangle]
 pub extern fn process(ptr: u32, len: u32) -> u64 {
-    let bytes = unsafe { slice::from_raw_parts_mut(ptr as *mut u8, len as usize) };
+    let bytes = unsafe {
+        slice::from_raw_parts_mut(
+            ptr as *mut u8,
+            len as usize)
+    };
 
     let mut msg: Message = serde_json::from_slice(bytes).unwrap();
     msg.body = String::from_utf8(msg.body).unwrap().to_uppercase().as_bytes().to_vec();
 
     let out_vec = serde_json::to_vec(&msg).unwrap();
-    let out_len = out_vec.len() as u32;
-    let out_ptr = alloc(out_len);
+    let out_len = out_vec.len();
+    let out_ptr = alloc(out_len as u32);
 
     unsafe {
-        std::ptr::copy_nonoverlapping(out_vec.as_ptr(), out_ptr, out_len as usize);
-    }
+        std::ptr::copy_nonoverlapping(
+            out_vec.as_ptr(),
+            out_ptr,
+            out_len as usize)
+    };
 
     return ((out_ptr as u64) << 32) | out_len as u64;
 }
