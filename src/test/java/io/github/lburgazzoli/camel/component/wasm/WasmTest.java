@@ -2,6 +2,7 @@ package io.github.lburgazzoli.camel.component.wasm;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
+import org.apache.camel.Expression;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -44,8 +45,9 @@ public class WasmTest {
         try (CamelContext cc = new DefaultCamelContext()) {
 
             FluentProducerTemplate pt = cc.createFluentProducerTemplate();
+            Expression expr = new WasmLanguage().createExpression("transform@functions.wasm");
 
-            cc.getRegistry().bind("wasm", new WasmLanguage().createExpression("transform@functions.wasm"));
+            cc.getRegistry().bind("wasm", expr);
             cc.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
